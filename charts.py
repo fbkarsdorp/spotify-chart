@@ -22,7 +22,12 @@ def get_chart(date, region='en', freq='daily', chart='top200'):
     else:
         date = f'{date.date()}'
     url = f'https://spotifycharts.com/{chart}/{region}/{freq}/{date}/download'
-    df = pd.read_csv(io.StringIO(requests.get(url).text))
+    data = io.StringIO(requests.get(url).text)
+    try:
+        df = pd.read_csv(data)
+    except pd.errors.ParserError:
+        df = None
+        print(data)
     return df
 
 
@@ -31,9 +36,10 @@ def get_charts(start, end, region='en', freq='daily', chart='top200', sleep=1):
     dfs = []
     for date in tqdm.tqdm(pd.date_range(start=start, end=end, freq=sample)):
         df = get_chart(date, region=region, freq=freq, chart=chart)
-        df['date'] = date
-        dfs.append(df)
-        time.sleep(sleep)
+        if df is not None:
+            df['date'] = date
+            dfs.append(df)
+            time.sleep(sleep)
     return pd.concat(dfs)
 
 
