@@ -45,7 +45,7 @@ def get_charts(start, end, region='en', freq='daily', chart='top200', sleep=1):
 
 
 def header_handler(df):
-    find_row = df[0] == 'Position'
+    find_row = df[df.columns[0]] == 'Position'
     if True in find_row:
         column_names = df[find_row].values.tolist()
         drop_row = df.index[find_row].tolist()
