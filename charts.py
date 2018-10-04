@@ -50,7 +50,7 @@ def header_handler(df):
         column_names = df[find_row].values.tolist()
         drop_row = df.index[find_row].tolist()
         df = df.drop(drop_row)
-        df.columns = [item for sublist in column_names for item in sublist] # Unnest
+        df.columns = column_names
         df = df.dropna() # Drop row with Spotify's notice
         df = df.reset_index(drop=True)
     return df 
