@@ -25,6 +25,7 @@ def get_chart(date, region='en', freq='daily', chart='top200'):
     data = io.StringIO(requests.get(url).text)
     try:
         df = pd.read_csv(data)
+        df = header_handler(df) # Remove Spotify's notice from DataFrame
     except pd.errors.ParserError:
         df = None
         print(data)
@@ -41,6 +42,18 @@ def get_charts(start, end, region='en', freq='daily', chart='top200', sleep=1):
             dfs.append(df)
             time.sleep(sleep)
     return pd.concat(dfs)
+
+
+def header_handler(df):
+    find_row = df[df.columns[0]] == 'Position'
+    if True in find_row:
+        column_names = df[find_row].values.tolist()
+        drop_row = df.index[find_row].tolist()
+        df = df.drop(drop_row)
+        df.columns = column_names
+        df = df.dropna() # Drop row with Spotify's notice
+        df = df.reset_index(drop=True)
+    return df 
 
 
 if __name__ == '__main__':
